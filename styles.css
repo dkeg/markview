@@ -517,6 +517,17 @@ select { cursor: pointer; }
   color: var(--editor-text) !important;
 }
 
+/* Direct dark-mode override — higher specificity wins over codemirror.css */
+[data-theme="dark"] .CodeMirror {
+  color: #D4D4D4 !important;
+  background: #1c1c1e !important;
+}
+
+[data-theme="dark"] .CodeMirror pre,
+[data-theme="dark"] .CodeMirror-line {
+  color: #D4D4D4 !important;
+}
+
 .CodeMirror-scroll { padding: 8px 0; }
 .CodeMirror-lines { padding: 4px 0; }
 .CodeMirror pre.CodeMirror-line, .CodeMirror pre.CodeMirror-line-like {
