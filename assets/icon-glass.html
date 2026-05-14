@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1024px;
+    height: 1024px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  }
+
+  /* ── Background: rich blobs that show through the glass ── */
+  .bg {
+    position: absolute;
+    inset: 0;
+    background: #07091a;
+  }
+
+  /* Large colourful blobs — these refract beautifully through glass */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+  }
+  .blob-1 {
+    width: 640px; height: 640px;
+    top: -120px; left: -80px;
+    background: radial-gradient(circle, rgba(0,122,255,0.75) 0%, rgba(0,80,200,0.4) 50%, transparent 75%);
+  }
+  .blob-2 {
+    width: 540px; height: 540px;
+    bottom: -100px; right: -60px;
+    background: radial-gradient(circle, rgba(120,60,255,0.7) 0%, rgba(88,56,214,0.4) 50%, transparent 75%);
+  }
+  .blob-3 {
+    width: 380px; height: 380px;
+    top: 300px; right: 60px;
+    background: radial-gradient(circle, rgba(0,210,200,0.45) 0%, transparent 70%);
+  }
+  .blob-4 {
+    width: 280px; height: 280px;
+    bottom: 180px; left: 80px;
+    background: radial-gradient(circle, rgba(255,60,120,0.35) 0%, transparent 70%);
+  }
+
+  /* Subtle noise/grain texture over background */
+  .bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  /* ── Glass panel ── */
+  .glass {
+    position: relative;
+    width: 648px;
+    height: 728px;
+    border-radius: 44px;
+    z-index: 1;
+
+    /* The glass tint — very subtle white */
+    background: rgba(255, 255, 255, 0.11);
+
+    /* Frosted blur of everything behind */
+    backdrop-filter: blur(32px) saturate(180%) brightness(1.05);
+    -webkit-backdrop-filter: blur(32px) saturate(180%) brightness(1.05);
+
+    /* Glass border: bright top edge fades to subtler sides */
+    border: 1px solid rgba(255,255,255,0.28);
+    border-top-color: rgba(255,255,255,0.55);
+    border-bottom-color: rgba(255,255,255,0.12);
+
+    box-shadow:
+      /* top specular highlight — the key glass cue */
+      inset 0 1.5px 0 rgba(255,255,255,0.65),
+      /* inner bottom shadow */
+      inset 0 -1px 0 rgba(255,255,255,0.08),
+      /* left edge shimmer */
+      inset 1px 0 rgba(255,255,255,0.18),
+      /* outer glow matching the blobs */
+      0 0 0 1px rgba(255,255,255,0.06),
+      0 32px 80px rgba(0,0,0,0.55),
+      0 8px 22px rgba(0,0,0,0.35),
+      0 2px 6px rgba(0,0,0,0.25);
+
+    padding: 60px 58px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  /* Subtle inner gradient — catches light from top-left */
+  .glass::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 44px;
+    background: linear-gradient(
+      135deg,
+      rgba(255,255,255,0.13) 0%,
+      rgba(255,255,255,0.04) 40%,
+      rgba(0,0,0,0.05) 70%,
+      rgba(0,0,0,0.12) 100%
+    );
+    pointer-events: none;
+  }
+
+  /* Refraction shimmer along the top edge */
+  .glass::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 44px; right: 44px;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255,255,255,0.7) 30%,
+      rgba(255,255,255,0.9) 50%,
+      rgba(255,255,255,0.7) 70%,
+      transparent 100%
+    );
+    border-radius: 1px;
+  }
+
+  /* ── M↓ badge — also glass ── */
+  .badge {
+    position: absolute;
+    top: 44px;
+    right: 50px;
+    border-radius: 22px;
+    padding: 8px 18px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    z-index: 2;
+
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-top-color: rgba(255,255,255,0.65);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.6),
+      0 4px 16px rgba(0,0,0,0.3),
+      0 1px 4px rgba(0,0,0,0.2);
+  }
+
+  .badge-m  { color: white; font-size: 21px; font-weight: 800; letter-spacing: -0.5px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+  .badge-arrow { color: rgba(255,255,255,0.8); font-size: 17px; margin-top: 1px; }
+
+  /* ── Content inside glass — all in white/light tones ── */
+  .h1-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hash-badge {
+    width: 44px; height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 900;
+    color: white;
+    flex-shrink: 0;
+    letter-spacing: -1px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+
+    /* Glass badge */
+    background: rgba(0, 122, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-top-color: rgba(255,255,255,0.65);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 4px 12px rgba(0,122,255,0.35);
+  }
+
+  .heading-pill {
+    height: 24px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 12px;
+  }
+
+  .line {
+    height: 14px;
+    background: rgba(255,255,255,0.28);
+    border-radius: 7px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .spacer { flex-shrink: 0; }
+
+  /* ── Code block — nested glass ── */
+  .code-block {
+    border-radius: 16px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+
+    background: rgba(0,0,0,0.22);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-top-color: rgba(255,255,255,0.25);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+  }
+
+  /* Coloured left accent — glass tinted */
+  .code-block::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, rgba(80,180,255,0.9), rgba(140,100,255,0.9));
+    border-radius: 2px;
+  }
+
+  .code-line { height: 12px; border-radius: 6px; }
+
+  .h2-row { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+
+  .h2-badge {
+    width: 38px; height: 34px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+    color: white;
+    flex-shrink: 0;
+    letter-spacing: -1px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+
+    background: rgba(94, 92, 230, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-top-color: rgba(255,255,255,0.6);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 3px 10px rgba(94,92,230,0.35);
+  }
+
+  .bullet-row { display: flex; align-items: center; gap: 12px; flex-shrink: 0; position: relative; z-index: 1; }
+
+  .bullet-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: rgba(100,200,255,0.85);
+    flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(100,200,255,0.6);
+  }
+
+  .bottom-rule {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(80,180,255,0.6) 0%, rgba(140,100,255,0.6) 50%, transparent 100%);
+    border-radius: 1px;
+    margin-top: auto;
+    position: relative;
+    z-index: 1;
+  }
+</style>
+</head>
+<body>
+<div class="bg">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+</div>
+
+<div class="glass">
+  <div class="badge">
+    <span class="badge-m">M</span>
+    <span class="badge-arrow">↓</span>
+  </div>
+
+  <div class="h1-row">
+    <div class="hash-badge">#</div>
+    <div class="heading-pill" style="width:210px"></div>
+  </div>
+
+  <div class="line" style="width:88%"></div>
+  <div class="spacer" style="height:10px"></div>
+  <div class="line" style="width:76%"></div>
+  <div class="spacer" style="height:10px"></div>
+  <div class="line" style="width:83%"></div>
+  <div class="spacer" style="height:10px"></div>
+  <div class="line" style="width:55%"></div>
+
+  <div class="spacer" style="height:20px"></div>
+
+  <div class="code-block">
+    <div class="code-line" style="width:28%; background:rgba(255,120,110,0.9)"></div>
+    <div class="code-line" style="width:52%; background:rgba(80,180,255,0.9)"></div>
+    <div class="code-line" style="width:40%; background:rgba(200,140,255,0.85)"></div>
+    <div class="code-line" style="width:60%; background:rgba(80,230,200,0.75)"></div>
+    <div class="code-line" style="width:34%; background:rgba(255,120,110,0.8)"></div>
+  </div>
+
+  <div class="spacer" style="height:24px"></div>
+
+  <div class="h2-row" style="margin-bottom:20px">
+    <div class="h2-badge">##</div>
+    <div class="heading-pill" style="width:158px;height:20px"></div>
+  </div>
+
+  <div class="line" style="width:90%"></div>
+  <div class="spacer" style="height:10px"></div>
+  <div class="line" style="width:72%"></div>
+
+  <div class="spacer" style="height:20px"></div>
+
+  <div class="bullet-row" style="margin-bottom:12px">
+    <div class="bullet-dot"></div>
+    <div class="line" style="width:48%; margin:0"></div>
+  </div>
+  <div class="bullet-row" style="margin-bottom:12px">
+    <div class="bullet-dot"></div>
+    <div class="line" style="width:38%; margin:0"></div>
+  </div>
+  <div class="bullet-row">
+    <div class="bullet-dot"></div>
+    <div class="line" style="width:56%; margin:0"></div>
+  </div>
+
+  <div class="spacer" style="height:24px"></div>
+  <div class="bottom-rule"></div>
+</div>
+</body>
+</html>

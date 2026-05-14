@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1024px;
+    height: 1024px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  }
+
+  .bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 65% 55% at 25% 18%, rgba(30, 80, 180, 0.5) 0%, transparent 65%),
+      radial-gradient(ellipse 55% 45% at 78% 82%, rgba(80, 50, 180, 0.45) 0%, transparent 60%),
+      linear-gradient(150deg, #0d1626 0%, #0a1020 50%, #06080f 100%);
+  }
+
+  .bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .paper {
+    position: relative;
+    width: 648px;
+    height: 728px;
+    background: linear-gradient(160deg, #1e2540 0%, #161d30 60%, #111827 100%);
+    border-radius: 44px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.09),
+      0 40px 90px rgba(0,0,0,0.65),
+      0 10px 24px rgba(0,0,0,0.4),
+      0 2px 6px rgba(0,0,0,0.35);
+    padding: 60px 58px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    z-index: 1;
+  }
+
+  .badge {
+    position: absolute;
+    top: 44px;
+    right: 50px;
+    background: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
+    border-radius: 22px;
+    padding: 8px 18px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 4px 14px rgba(10,132,255,0.45);
+  }
+
+  .badge-m { color: white; font-size: 21px; font-weight: 800; letter-spacing: -0.5px; }
+  .badge-arrow { color: rgba(255,255,255,0.85); font-size: 17px; margin-top: 1px; }
+
+  .h1-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .hash-badge {
+    width: 44px;
+    height: 40px;
+    background: #0A84FF;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 900;
+    color: white;
+    flex-shrink: 0;
+    letter-spacing: -1px;
+    box-shadow: 0 3px 10px rgba(10,132,255,0.4);
+  }
+
+  .heading-pill {
+    height: 24px;
+    background: rgba(255,255,255,0.75);
+    border-radius: 12px;
+  }
+
+  .line {
+    height: 14px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 7px;
+    flex-shrink: 0;
+  }
+
+  .spacer { flex-shrink: 0; }
+
+  .code-block {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .code-block::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #0A84FF, #5E5CE6);
+    border-radius: 2px;
+  }
+
+  .code-line { height: 12px; border-radius: 6px; }
+
+  .h2-row { display: flex; align-items: center; gap: 12px; }
+
+  .h2-badge {
+    width: 38px;
+    height: 34px;
+    background: #5E5CE6;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+    color: white;
+    flex-shrink: 0;
+    letter-spacing: -1px;
+    box-shadow: 0 2px 8px rgba(94,92,230,0.4);
+  }
+
+  .bullet-row { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+
+  .bullet-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #0A84FF;
+    opacity: 0.75;
+    flex-shrink: 0;
+  }
+
+  .bottom-rule {
+    height: 2px;
+    background: linear-gradient(90deg, #0A84FF 0%, #5E5CE6 50%, transparent 100%);
+    border-radius: 1px;
+    opacity: 0.25;
+    margin-top: auto;
+  }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="paper">
+  <div class="badge">
+    <span class="badge-m">M</span>
+    <span class="badge-arrow">↓</span>
+  </div>
+
+  <div class="h1-row">
+    <div class="hash-badge">#</div>
+    <div class="heading-pill" style="width:210px"></div>
+  </div>
+
+  <div class="line" style="width:88%"></div>
+  <div class="spacer" style="height:10px"></div>
+  <div class="line" style="width:76%"></div>
+  <div class="spacer" style="height:10px"></div>
+  <div class="line" style="width:83%"></div>
+  <div class="spacer" style="height:10px"></div>
+  <div class="line" style="width:55%"></div>
+
+  <div class="spacer" style="height:20px"></div>
+
+  <div class="code-block">
+    <div class="code-line" style="width:28%; background:#FF6961; opacity:0.9"></div>
+    <div class="code-line" style="width:52%; background:#5EB5FF; opacity:0.9"></div>
+    <div class="code-line" style="width:40%; background:#CF9FFF; opacity:0.85"></div>
+    <div class="code-line" style="width:60%; background:#64D2FF; opacity:0.7"></div>
+    <div class="code-line" style="width:34%; background:#FF6961; opacity:0.75"></div>
+  </div>
+
+  <div class="spacer" style="height:24px"></div>
+
+  <div class="h2-row" style="margin-bottom:20px">
+    <div class="h2-badge">##</div>
+    <div class="heading-pill" style="width:158px;height:20px"></div>
+  </div>
+
+  <div class="line" style="width:90%"></div>
+  <div class="spacer" style="height:10px"></div>
+  <div class="line" style="width:72%"></div>
+
+  <div class="spacer" style="height:20px"></div>
+
+  <div class="bullet-row" style="margin-bottom:12px">
+    <div class="bullet-dot"></div>
+    <div class="line" style="width:48%; margin:0"></div>
+  </div>
+  <div class="bullet-row" style="margin-bottom:12px">
+    <div class="bullet-dot"></div>
+    <div class="line" style="width:38%; margin:0"></div>
+  </div>
+  <div class="bullet-row">
+    <div class="bullet-dot"></div>
+    <div class="line" style="width:56%; margin:0"></div>
+  </div>
+
+  <div class="spacer" style="height:24px"></div>
+  <div class="bottom-rule"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IDE / editor
+.claude/
+
+# Electron builder cache
+.cache/

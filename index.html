@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+  <title>MarkView</title>
+  <link rel="stylesheet" href="node_modules/codemirror/lib/codemirror.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <div id="sidebar-header">
+        <div id="traffic-light-spacer"></div>
+        <div id="sidebar-actions">
+          <button class="icon-btn" id="btn-new" title="New File (⌘N)">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 2a.75.75 0 01.75.75v4.5h4.5a.75.75 0 010 1.5h-4.5v4.5a.75.75 0 01-1.5 0v-4.5h-4.5a.75.75 0 010-1.5h4.5v-4.5A.75.75 0 018 2z"/>
+            </svg>
+          </button>
+          <button class="icon-btn" id="btn-open" title="Open File (⌘O)">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M1.75 1A1.75 1.75 0 000 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0016 13.25v-8.5A1.75 1.75 0 0014.25 3H7.5L5.75 1H1.75zM1.5 2.75a.25.25 0 01.25-.25H5.5l1.75 2H14.25a.25.25 0 01.25.25v8.5a.25.25 0 01-.25.25H1.75a.25.25 0 01-.25-.25V2.75z"/>
+            </svg>
+          </button>
+          <button class="icon-btn" id="btn-open-folder" title="Open Folder (⌘⇧O)">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M.75 6.5a.75.75 0 000 1.5h1.5a.75.75 0 000-1.5H.75zm3 0a.75.75 0 000 1.5h10a.75.75 0 000-1.5h-10zm12 0a.75.75 0 000 1.5h1.5a.75.75 0 000-1.5h-1.5zM1.75 1A1.75 1.75 0 000 2.75v1.5C0 5.216.784 6 1.75 6h12.5A1.75 1.75 0 0016 4.25v-1.5A1.75 1.75 0 0014.25 1H1.75zM1.5 2.75a.25.25 0 01.25-.25h12.5a.25.25 0 01.25.25v1.5a.25.25 0 01-.25.25H1.75a.25.25 0 01-.25-.25v-1.5zm0 7.5C1.5 9.284.784 9 0 9v4.25C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0016 13.25V9c-.784 0-1.5.284-1.5 1.25v3a.25.25 0 01-.25.25H1.75a.25.25 0 01-.25-.25v-3z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Vertical tabs -->
+      <div id="tabs-section">
+        <div id="tabs-list"></div>
+      </div>
+
+      <!-- File tree -->
+      <div id="file-tree-section" style="display:none">
+        <div id="file-tree-header">
+          <span id="folder-name">Folder</span>
+          <button class="icon-btn" id="btn-close-folder" title="Close Folder">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="file-tree"></div>
+      </div>
+    </div>
+
+    <!-- Sidebar resize handle -->
+    <div class="resize-handle vertical" id="sidebar-resize-handle"></div>
+
+    <!-- Main content -->
+    <div id="main-content">
+
+      <!-- Toolbar -->
+      <div id="toolbar">
+        <div id="view-mode-buttons">
+          <button class="view-btn" id="btn-view-editor" data-mode="editor" title="Editor Only (⌘1)">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M1 2.5A1.5 1.5 0 012.5 1h11A1.5 1.5 0 0115 2.5v11a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 13.5v-11zm1.5 0a.5.5 0 00-.5.5v11a.5.5 0 00.5.5h11a.5.5 0 00.5-.5v-11a.5.5 0 00-.5-.5h-11z"/>
+              <path d="M4 5h8v1H4zm0 3h8v1H4zm0 3h5v1H4z"/>
+            </svg>
+          </button>
+          <button class="view-btn active" id="btn-view-split" data-mode="split" title="Split View (⌘2)">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M1 2.5A1.5 1.5 0 012.5 1h11A1.5 1.5 0 0115 2.5v11a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 13.5v-11zm1.5-.5a.5.5 0 00-.5.5v11a.5.5 0 00.5.5h5v-12H2.5zm5.5 12h5.5a.5.5 0 00.5-.5v-11a.5.5 0 00-.5-.5H8v12z"/>
+            </svg>
+          </button>
+          <button class="view-btn" id="btn-view-preview" data-mode="preview" title="Preview Only (⌘3)">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 2C4.13 2 1 5.13 1 8s3.13 6 7 6 7-3.13 7-6-3.13-6-7-6zm0 10.5c-2.485 0-4.5-2.015-4.5-4.5S5.515 3.5 8 3.5 12.5 5.515 12.5 8 10.485 12.5 8 12.5z"/>
+              <path d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="toolbar-center">
+          <span id="file-name-display"></span>
+          <span id="modified-indicator" style="display:none">•</span>
+        </div>
+        <div id="toolbar-right">
+          <button class="icon-btn toggle-btn" id="btn-sync-scroll" title="Sync Scroll">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 1.5a5.5 5.5 0 110 11 5.5 5.5 0 010-11zm.75 2.75v3.56l2.47 2.47-1.06 1.06-2.75-2.75A.75.75 0 017.25 9V5.25h1.5z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Panels -->
+      <div id="panels">
+        <div id="editor-panel">
+          <textarea id="editor-textarea"></textarea>
+        </div>
+        <div class="resize-handle vertical" id="panels-resize-handle"></div>
+        <div id="preview-panel">
+          <div id="preview-content"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Welcome screen (shown when no tabs are open) -->
+  <div id="welcome-screen" style="display:none">
+    <div class="welcome-inner">
+      <div class="welcome-icon">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <rect width="64" height="64" rx="14" fill="var(--accent)"/>
+          <path d="M16 20h32M16 28h20M16 36h24M16 44h16" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h1>MarkView</h1>
+      <p>Open a markdown or JSON file to get started.</p>
+      <div class="welcome-buttons">
+        <button class="welcome-btn primary" id="welcome-open-file">Open File…</button>
+        <button class="welcome-btn" id="welcome-open-folder">Open Folder…</button>
+        <button class="welcome-btn" id="welcome-new-file">New File</button>
+      </div>
+      <div class="welcome-shortcuts">
+        <div class="shortcut"><kbd>⌘O</kbd> Open file</div>
+        <div class="shortcut"><kbd>⌘⇧O</kbd> Open folder</div>
+        <div class="shortcut"><kbd>⌘N</kbd> New file</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings modal -->
+  <div id="settings-overlay" style="display:none">
+    <div id="settings-modal">
+      <div id="settings-header">
+        <span>Settings</span>
+        <button class="icon-btn" id="settings-close">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/>
+          </svg>
+        </button>
+      </div>
+      <div id="settings-body">
+        <div class="setting-group">
+          <label class="setting-label">Theme</label>
+          <div class="setting-control">
+            <select id="setting-theme">
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+        </div>
+        <div class="setting-group">
+          <label class="setting-label">Font Family</label>
+          <div class="setting-control">
+            <select id="setting-font-family">
+              <option value="'SF Mono', monospace">SF Mono</option>
+              <option value="'0xProto Nerd Font', monospace">0xProto Nerd Font</option>
+              <option value="Menlo, monospace">Menlo</option>
+              <option value="Monaco, monospace">Monaco</option>
+              <option value="'Andale Mono', monospace">Andale Mono</option>
+              <option value="'Courier New', monospace">Courier New</option>
+              <option value="'American Typewriter', serif">American Typewriter</option>
+              <option value="-apple-system, system-ui, sans-serif">System</option>
+            </select>
+          </div>
+        </div>
+        <div class="setting-group">
+          <label class="setting-label">Font Size <span id="font-size-display">14px</span></label>
+          <div class="setting-control">
+            <input type="range" id="setting-font-size" min="10" max="24" step="1" value="14">
+          </div>
+        </div>
+        <div class="setting-group">
+          <label class="setting-label">Line Numbers</label>
+          <div class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="setting-line-numbers" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="setting-group">
+          <label class="setting-label">Restore Session</label>
+          <div class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="setting-restore-session" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="setting-group">
+          <label class="setting-label">Sync Scroll</label>
+          <div class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="setting-sync-scroll" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="node_modules/codemirror/lib/codemirror.js"></script>
+  <script src="node_modules/codemirror/mode/markdown/markdown.js"></script>
+  <script src="node_modules/codemirror/mode/javascript/javascript.js"></script>
+  <script src="node_modules/codemirror/mode/xml/xml.js"></script>
+  <script src="node_modules/codemirror/addon/edit/closebrackets.js"></script>
+  <script src="node_modules/codemirror/addon/edit/matchbrackets.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>

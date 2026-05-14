@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1024px;
+    height: 1024px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0A52D4;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  }
+
+  .bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 30% 20%, rgba(100,160,255,0.45) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 80% 80%, rgba(88,86,214,0.4) 0%, transparent 65%),
+      linear-gradient(145deg, #1A6FFF 0%, #0A52D4 45%, #0438B2 100%);
+  }
+
+  /* Subtle dot grid */
+  .bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .paper {
+    position: relative;
+    width: 648px;
+    height: 728px;
+    background: #ffffff;
+    border-radius: 44px;
+    box-shadow:
+      0 2px 0 rgba(255,255,255,0.15) inset,
+      0 40px 90px rgba(0,0,0,0.42),
+      0 10px 24px rgba(0,0,0,0.22),
+      0 2px 6px rgba(0,0,0,0.18);
+    padding: 60px 58px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    z-index: 1;
+  }
+
+  /* Glossy top edge */
+  .paper::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 44px; right: 44px;
+    height: 1px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 1px;
+  }
+
+  /* Badge top-right */
+  .badge {
+    position: absolute;
+    top: 44px;
+    right: 50px;
+    background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+    border-radius: 22px;
+    padding: 8px 18px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 4px 12px rgba(0,122,255,0.4);
+  }
+
+  .badge-m {
+    color: white;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .badge-arrow {
+    color: rgba(255,255,255,0.85);
+    font-size: 17px;
+    margin-top: 1px;
+  }
+
+  /* ── Section 1: H1 heading ── */
+  .h1-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .hash-badge {
+    width: 44px;
+    height: 40px;
+    background: #007AFF;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 900;
+    color: white;
+    flex-shrink: 0;
+    letter-spacing: -1px;
+    box-shadow: 0 3px 8px rgba(0,122,255,0.35);
+  }
+
+  .heading-pill {
+    height: 24px;
+    background: #1c1c1e;
+    border-radius: 12px;
+    opacity: 0.72;
+  }
+
+  /* ── Text lines ── */
+  .line {
+    height: 14px;
+    background: #3c3c43;
+    border-radius: 7px;
+    opacity: 0.2;
+    flex-shrink: 0;
+  }
+
+  .spacer { flex-shrink: 0; }
+
+  /* ── Code block ── */
+  .code-block {
+    background: #f5f5f8;
+    border-radius: 16px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Left accent strip */
+  .code-block::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #007AFF, #5856D6);
+    border-radius: 2px;
+  }
+
+  .code-line {
+    height: 12px;
+    border-radius: 6px;
+  }
+
+  /* ── H2 heading ── */
+  .h2-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .h2-badge {
+    width: 38px;
+    height: 34px;
+    background: #5856D6;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+    color: white;
+    flex-shrink: 0;
+    letter-spacing: -1px;
+    box-shadow: 0 2px 6px rgba(88,86,214,0.35);
+  }
+
+  /* ── Bullet rows ── */
+  .bullet-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .bullet-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #007AFF;
+    opacity: 0.65;
+    flex-shrink: 0;
+  }
+
+  /* ── Bottom divider ── */
+  .bottom-rule {
+    height: 2px;
+    background: linear-gradient(90deg, #007AFF 0%, #5856D6 50%, transparent 100%);
+    border-radius: 1px;
+    opacity: 0.2;
+    margin-top: auto;
+  }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<div class="paper">
+  <!-- Badge -->
+  <div class="badge">
+    <span class="badge-m">M</span>
+    <span class="badge-arrow">↓</span>
+  </div>
+
+  <!-- H1 -->
+  <div class="h1-row">
+    <div class="hash-badge">#</div>
+    <div class="heading-pill" style="width:210px"></div>
+  </div>
+
+  <!-- Body text -->
+  <div class="line" style="width:88%"></div>
+  <div class="spacer" style="height:10px"></div>
+  <div class="line" style="width:76%"></div>
+  <div class="spacer" style="height:10px"></div>
+  <div class="line" style="width:83%"></div>
+  <div class="spacer" style="height:10px"></div>
+  <div class="line" style="width:55%"></div>
+
+  <div class="spacer" style="height:20px"></div>
+
+  <!-- Code block -->
+  <div class="code-block">
+    <div class="code-line" style="width:28%; background:#C41A16; opacity:0.8"></div>
+    <div class="code-line" style="width:52%; background:#007AFF; opacity:0.85"></div>
+    <div class="code-line" style="width:40%; background:#AD3DA4; opacity:0.8"></div>
+    <div class="code-line" style="width:60%; background:#1C00CF; opacity:0.6"></div>
+    <div class="code-line" style="width:34%; background:#C41A16; opacity:0.7"></div>
+  </div>
+
+  <div class="spacer" style="height:24px"></div>
+
+  <!-- H2 -->
+  <div class="h2-row" style="margin-bottom:20px">
+    <div class="h2-badge">##</div>
+    <div class="heading-pill" style="width:158px;height:20px"></div>
+  </div>
+
+  <!-- More text -->
+  <div class="line" style="width:90%"></div>
+  <div class="spacer" style="height:10px"></div>
+  <div class="line" style="width:72%"></div>
+
+  <div class="spacer" style="height:20px"></div>
+
+  <!-- Bullets -->
+  <div class="bullet-row" style="margin-bottom:12px">
+    <div class="bullet-dot"></div>
+    <div class="line" style="width:48%; margin:0"></div>
+  </div>
+  <div class="bullet-row" style="margin-bottom:12px">
+    <div class="bullet-dot"></div>
+    <div class="line" style="width:38%; margin:0"></div>
+  </div>
+  <div class="bullet-row">
+    <div class="bullet-dot"></div>
+    <div class="line" style="width:56%; margin:0"></div>
+  </div>
+
+  <!-- Bottom rule -->
+  <div class="spacer" style="height:24px"></div>
+  <div class="bottom-rule"></div>
+</div>
+</body>
+</html>
