@@ -7,13 +7,16 @@ let activeTabId = null
 let nextTabId = 1
 let settings = {}
 let systemTheme = 'light'
-let viewMode = 'split'
+let viewMode = 'preview'
 let sidebarVisible = true
 let openFolderPath = null
 let treeExpanded = {}
 let syncScrollActive = false
 let isSyncScrolling = false
 let editor = null
+let tocVisible = true
+let tocCollapsed = {}
+let activeTocId = null
 
 // ─── DOM refs ───────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id)
@@ -33,6 +36,9 @@ const welcomeScreen = $('welcome-screen')
 const settingsOverlay = $('settings-overlay')
 const sidebarResizeHandle  = $('sidebar-resize-handle')
 const panelsResizeHandle   = $('panels-resize-handle')
+const tocResizeHandle      = $('toc-resize-handle')
+const tocPanel             = $('toc-panel')
+const tocList              = $('toc-list')
 
 // ─── Init ───────────────────────────────────────────────────────────────────
 async function init() {
@@ -48,6 +54,8 @@ async function init() {
   bindWelcomeButtons()
   bindSettingsModal()
   bindMenuEvents()
+  setViewMode(viewMode)
+  applyTocVisibility()
 
   if (settings.restoreSession) {
     await restoreSession()
@@ -121,6 +129,8 @@ function initEditor() {
     requestAnimationFrame(() => { isSyncScrolling = false })
   })
 
+  previewPanel.addEventListener('scroll', updateActiveTocFromScroll, { passive: true })
+
   applyEditorSettings()
 }
 
@@ -138,6 +148,9 @@ function applyEditorSettings() {
   // Sync the sync-scroll button state
   syncScrollActive = settings.syncScroll !== false
   $('btn-sync-scroll').classList.toggle('active', syncScrollActive)
+
+  tocVisible = settings.showToc !== false
+  applyTocVisibility()
 }
 
 // ─── Tabs ────────────────────────────────────────────────────────────────────
@@ -261,7 +274,11 @@ function renderTabs() {
 // ─── Preview ─────────────────────────────────────────────────────────────────
 function updatePreview() {
   const tab = activeTab()
-  if (!tab) { previewContent.innerHTML = ''; return }
+  if (!tab) {
+    previewContent.innerHTML = ''
+    updateToc()
+    return
+  }
 
   if (tab.type === 'json') {
     try {
@@ -272,6 +289,7 @@ function updatePreview() {
       previewContent.className = 'json-preview'
       previewContent.textContent = tab.content
     }
+    updateToc()
   } else {
     previewContent.className = ''
     previewContent.innerHTML = api.renderMarkdown(tab.content)
@@ -279,7 +297,188 @@ function updatePreview() {
     previewContent.querySelectorAll('input[type="checkbox"]').forEach(cb => {
       cb.disabled = true
     })
+    updateToc()
   }
+}
+
+// ─── Table of Contents ───────────────────────────────────────────────────────
+function extractHeadingsFromPreview() {
+  const headings = []
+  previewContent.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach(el => {
+    if (!el.id) return
+    headings.push({
+      level: parseInt(el.tagName[1], 10),
+      id: el.id,
+      text: el.textContent.trim()
+    })
+  })
+  return headings
+}
+
+function buildHeadingTree(headings) {
+  const root = { children: [] }
+  const stack = [{ level: 0, node: root }]
+
+  headings.forEach(heading => {
+    const node = { ...heading, children: [] }
+    while (stack.length > 1 && stack[stack.length - 1].level >= heading.level) {
+      stack.pop()
+    }
+    stack[stack.length - 1].node.children.push(node)
+    stack.push({ level: heading.level, node })
+  })
+
+  return root.children
+}
+
+function updateToc() {
+  const tab = activeTab()
+  if (!tab || tab.type === 'json' || viewMode === 'editor') {
+    tocList.innerHTML = '<div class="toc-empty">No headings</div>'
+    activeTocId = null
+    return
+  }
+
+  const headings = extractHeadingsFromPreview()
+  if (headings.length === 0) {
+    tocList.innerHTML = '<div class="toc-empty">No headings in this document</div>'
+    activeTocId = null
+    return
+  }
+
+  const tree = buildHeadingTree(headings)
+  tocList.innerHTML = ''
+  tree.forEach(node => tocList.appendChild(renderTocNode(node)))
+  updateActiveTocFromScroll()
+}
+
+function renderTocNode(node) {
+  const item = document.createElement('div')
+  item.className = 'toc-item'
+  item.dataset.level = String(node.level)
+  item.dataset.id = node.id
+
+  const row = document.createElement('div')
+  row.className = 'toc-row' + (node.id === activeTocId ? ' active' : '')
+
+  const toggle = document.createElement('button')
+  toggle.className = 'toc-toggle' + (node.children.length ? '' : ' hidden')
+  toggle.type = 'button'
+  toggle.setAttribute('aria-label', 'Toggle section')
+  toggle.innerHTML = `<svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor">
+    <path d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"/>
+  </svg>`
+  if (tocCollapsed[node.id]) toggle.classList.add('collapsed')
+
+  const link = document.createElement('button')
+  link.className = 'toc-link'
+  link.type = 'button'
+  link.textContent = node.text
+  link.title = node.text
+
+  row.appendChild(toggle)
+  row.appendChild(link)
+  item.appendChild(row)
+
+  let childrenEl = null
+  if (node.children.length) {
+    childrenEl = document.createElement('div')
+    childrenEl.className = 'toc-children' + (tocCollapsed[node.id] ? ' collapsed' : '')
+    node.children.forEach(child => childrenEl.appendChild(renderTocNode(child)))
+    item.appendChild(childrenEl)
+  }
+
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation()
+    tocCollapsed[node.id] = !tocCollapsed[node.id]
+    toggle.classList.toggle('collapsed', tocCollapsed[node.id])
+    if (childrenEl) childrenEl.classList.toggle('collapsed', tocCollapsed[node.id])
+  })
+
+  link.addEventListener('click', () => navigateToHeading(node))
+
+  return item
+}
+
+function getHeadingScrollTop(heading) {
+  const panelRect = previewPanel.getBoundingClientRect()
+  const headingRect = heading.getBoundingClientRect()
+  return previewPanel.scrollTop + (headingRect.top - panelRect.top)
+}
+
+function navigateToHeading(heading) {
+  const el = previewContent.querySelector(`#${CSS.escape(heading.id)}`)
+  if (!el) return
+
+  isSyncScrolling = true
+  previewPanel.scrollTo({
+    top: Math.max(0, getHeadingScrollTop(el) - 16),
+    behavior: 'smooth'
+  })
+  scrollEditorToHeading(heading)
+  activeTocId = heading.id
+  highlightActiveTocItem(heading.id)
+  setTimeout(() => { isSyncScrolling = false }, 400)
+}
+
+function scrollEditorToHeading(heading) {
+  if (!editor || viewMode === 'preview') return
+
+  const lines = editor.getValue().split('\n')
+  for (let i = 0; i < lines.length; i++) {
+    const match = lines[i].match(/^(#{1,6})\s+(.+)$/)
+    if (!match || match[1].length !== heading.level) continue
+
+    const text = match[2].replace(/\s*#+\s*$/, '').trim()
+    if (text === heading.text) {
+      editor.scrollIntoView({ line: i, ch: 0 }, 120)
+      editor.setCursor(i, 0)
+      return
+    }
+  }
+}
+
+function updateActiveTocFromScroll() {
+  if (!tocVisible || viewMode === 'editor') return
+
+  const tab = activeTab()
+  if (!tab || tab.type === 'json') return
+
+  const headings = Array.from(previewContent.querySelectorAll('h1,h2,h3,h4,h5,h6'))
+  if (!headings.length) return
+
+  const scrollTop = previewPanel.scrollTop + 24
+  let current = headings[0]
+
+  headings.forEach(heading => {
+    if (getHeadingScrollTop(heading) <= scrollTop) current = heading
+  })
+
+  if (current?.id && current.id !== activeTocId) {
+    activeTocId = current.id
+    highlightActiveTocItem(current.id)
+  }
+}
+
+function highlightActiveTocItem(id) {
+  tocList.querySelectorAll('.toc-row').forEach(row => {
+    row.classList.toggle('active', row.parentElement?.dataset.id === id)
+  })
+}
+
+function applyTocVisibility() {
+  const show = tocVisible && viewMode !== 'editor'
+  tocPanel.classList.toggle('hidden', !show)
+  tocResizeHandle.classList.toggle('hidden', !show)
+  $('btn-toc').classList.toggle('active', tocVisible)
+}
+
+function toggleToc() {
+  tocVisible = !tocVisible
+  settings.showToc = tocVisible
+  api.setSettings(settings)
+  applyTocVisibility()
+  if (tocVisible) updateToc()
 }
 
 // ─── File operations ─────────────────────────────────────────────────────────
@@ -436,6 +635,8 @@ function setViewMode(mode) {
   document.querySelectorAll('.view-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.mode === mode)
   })
+  applyTocVisibility()
+  updateToc()
   editor && editor.refresh()
 }
 
@@ -458,6 +659,8 @@ function bindToolbar() {
     api.setSettings(settings)
     $('btn-sync-scroll').classList.toggle('active', syncScrollActive)
   })
+
+  $('btn-toc').addEventListener('click', toggleToc)
 }
 
 function bindSidebarButtons() {
@@ -491,6 +694,7 @@ function bindMenuEvents() {
     setViewMode(modes[(idx + 1) % modes.length])
   })
   api.on('menu-toggle-sidebar', toggleSidebar)
+  api.on('menu-toggle-toc', toggleToc)
   api.on('open-settings', openSettings)
   api.on('open-external-file', (filePath) => openFile(filePath))
 }
@@ -506,6 +710,7 @@ function openSettings() {
   $('setting-line-numbers').checked = settings.lineNumbers !== false
   $('setting-restore-session').checked = settings.restoreSession !== false
   $('setting-sync-scroll').checked = settings.syncScroll !== false
+  $('setting-show-toc').checked = settings.showToc !== false
 }
 
 function bindSettingsModal() {
@@ -550,6 +755,14 @@ function bindSettingsModal() {
     $('btn-sync-scroll').classList.toggle('active', syncScrollActive)
     saveSettingsDebounced()
   })
+
+  $('setting-show-toc').addEventListener('change', (e) => {
+    settings.showToc = e.target.checked
+    tocVisible = e.target.checked
+    applyTocVisibility()
+    if (tocVisible) updateToc()
+    saveSettingsDebounced()
+  })
 }
 
 function closeSettings() {
@@ -574,7 +787,6 @@ async function restoreSession() {
     if (tab) switchTab(tab.id)
   }
 
-  if (session.viewMode) setViewMode(session.viewMode)
   if (session.folderPath) await openFolder(session.folderPath)
 }
 
@@ -588,7 +800,6 @@ function persistSession() {
   const session = {
     openFiles: tabs.map(t => ({ filePath: t.filePath, content: t.filePath ? undefined : t.content, type: t.type })),
     activeFile: activeTab()?.filePath || null,
-    viewMode,
     folderPath: openFolderPath
   }
   api.saveSession(session)
@@ -602,7 +813,7 @@ function initResizeHandles() {
   })
 
   makeResizable(panelsResizeHandle, (delta) => {
-    const totalWidth = panels.offsetWidth
+    const totalWidth = panels.offsetWidth - (tocVisible && viewMode !== 'editor' ? tocPanel.offsetWidth + tocResizeHandle.offsetWidth : 0)
     const editorWidth = editorPanel.offsetWidth
     const newEditorWidth = Math.max(200, Math.min(totalWidth - 200, editorWidth + delta))
     const pct = (newEditorWidth / totalWidth * 100).toFixed(2)
@@ -610,6 +821,11 @@ function initResizeHandles() {
     editorPanel.style.width = pct + '%'
     previewPanel.style.flex = '1'
     editor && editor.refresh()
+  })
+
+  makeResizable(tocResizeHandle, (delta) => {
+    const newWidth = Math.max(140, Math.min(320, tocPanel.offsetWidth - delta))
+    tocPanel.style.width = newWidth + 'px'
   })
 }
 

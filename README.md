@@ -9,6 +9,7 @@ A native macOS markdown viewer and editor built with Electron. Designed to feel 
 - **Live preview** — rendered markdown preview with full GFM support (tables, task lists, fenced code)
 - **Split view** — editor and preview side by side, or toggle between edit-only and preview-only modes
 - **Synchronized scrolling** — optional linked scrolling between editor and preview in split view
+- **Table of contents** — collapsible outline panel on the right; click any heading to jump to that section
 - **Vertical tabs** — open files shown as tabs in the left sidebar
 - **File tree browser** — open a folder and navigate its contents
 - **JSON support** — syntax-highlighted editing and formatted preview for `.json` files
@@ -64,6 +65,7 @@ npm run build:x64     # Intel only
 | `Cmd+2` | Split view |
 | `Cmd+3` | Preview only |
 | `Cmd+B` | Toggle sidebar |
+| `Cmd+Shift+T` | Toggle table of contents |
 | `Cmd+Shift+P` | Cycle view modes |
 | `Cmd+,` | Settings |
 
@@ -77,6 +79,7 @@ Access via `Cmd+,` or the app menu:
 - **Line Numbers** — toggle line number gutter in the editor
 - **Restore Session** — reopen previously open tabs on launch
 - **Sync Scroll** — toggle synchronized scrolling between editor and preview in split view
+- **Table of Contents** — show or hide the outline panel on the right
 
 ## Project Structure
 

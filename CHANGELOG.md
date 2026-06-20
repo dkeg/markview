@@ -4,6 +4,21 @@ All notable changes to MarkView will be documented here.
 
 ---
 
+## [1.1.0] — 2026-06-19
+
+### Added
+
+- **Table of contents** — collapsible outline panel on the right with click-to-navigate, scroll spy, and resizable width
+- Toggle via toolbar button, `Cmd+Shift+T`, View menu, or Settings
+- Heading IDs enabled in markdown preview for anchor navigation
+
+### Changed
+
+- App now opens in **Preview Only** mode by default (was split view)
+- View mode is no longer restored from session so each launch starts in preview
+
+---
+
 ## [1.0.1] — 2026-06-19
 
 ### Build

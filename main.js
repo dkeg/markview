@@ -30,7 +30,8 @@ function loadSettings() {
       fontSize: 14,
       lineNumbers: true,
       restoreSession: true,
-      syncScroll: true
+      syncScroll: true,
+      showToc: true
     }
   }
 }
@@ -171,6 +172,11 @@ function buildMenu() {
           label: 'Toggle Sidebar',
           accelerator: 'Cmd+B',
           click: () => mainWindow && mainWindow.webContents.send('menu-toggle-sidebar')
+        },
+        {
+          label: 'Toggle Table of Contents',
+          accelerator: 'Cmd+Shift+T',
+          click: () => mainWindow && mainWindow.webContents.send('menu-toggle-toc')
         },
         { type: 'separator' },
         { label: 'Reload', role: 'reload' },

@@ -3,7 +3,9 @@ const { marked } = require('marked')
 
 marked.setOptions({
   gfm: true,
-  breaks: false
+  breaks: false,
+  headerIds: true,
+  mangle: false
 })
 
 contextBridge.exposeInMainWorld('api', {
@@ -45,7 +47,8 @@ contextBridge.exposeInMainWorld('api', {
       'menu-close-tab',
       'menu-view-mode',
       'menu-cycle-view',
-      'menu-toggle-sidebar'
+      'menu-toggle-sidebar',
+      'menu-toggle-toc'
     ]
     if (allowed.includes(channel)) {
       const handler = (event, ...args) => callback(...args)
