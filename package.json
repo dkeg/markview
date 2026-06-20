@@ -1,6 +1,6 @@
 {
   "name": "markview",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A native macOS markdown viewer and editor built with Electron",
   "main": "main.js",
   "repository": {
@@ -11,7 +11,9 @@
   "license": "MIT",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --mac"
+    "build": "electron-builder --mac --universal",
+    "build:arm64": "electron-builder --mac --arm64",
+    "build:x64": "electron-builder --mac --x64"
   },
   "dependencies": {
     "codemirror": "^5.65.16",
@@ -30,8 +32,9 @@
     "mac": {
       "category": "public.app-category.productivity",
       "icon": "assets/icon-dark.icns",
+      "mergeASARs": true,
       "target": [
-        { "target": "dmg", "arch": ["arm64", "x64"] }
+        { "target": "dmg", "arch": ["universal"] }
       ],
       "fileAssociations": [
         { "ext": "md", "name": "Markdown File", "role": "Editor" },

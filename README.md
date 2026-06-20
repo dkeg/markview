@@ -35,10 +35,19 @@ npm start
 npm run build
 ```
 
-The built `.app` will be in `dist/`. Copy it to your Applications folder:
+This produces a **Universal** binary (`arm64` + `x64`) so MarkView runs natively on Apple silicon without Rosetta, while still supporting Intel Macs. See [Apple's Rosetta guidance](https://support.apple.com/en-us/102527) for why this matters.
+
+The built `.app` will be in `dist/mac-universal/`. Copy it to your Applications folder:
 
 ```bash
-cp -R dist/mac-arm64/MarkView.app ~/Applications/
+cp -R dist/mac-universal/MarkView.app ~/Applications/
+```
+
+For architecture-specific builds during development:
+
+```bash
+npm run build:arm64   # Apple silicon only
+npm run build:x64     # Intel only
 ```
 
 ## Keyboard Shortcuts

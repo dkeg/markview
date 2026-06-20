@@ -4,6 +4,17 @@ All notable changes to MarkView will be documented here.
 
 ---
 
+## [1.0.1] — 2026-06-19
+
+### Build
+
+- macOS release is now a single **Universal** DMG (`arm64` + `x64`) instead of separate per-architecture installers
+- Apple silicon Macs run MarkView natively without Rosetta, per [Apple's Intel app transition guidance](https://support.apple.com/en-us/102527)
+- Added `build:arm64` and `build:x64` scripts for architecture-specific local builds
+- Enabled `mergeASARs` to reduce universal bundle size (no native Node modules in this app)
+
+---
+
 ## [1.0.0] — 2026-05-13
 
 ### Initial release
