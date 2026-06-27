@@ -1,11 +1,25 @@
 const { contextBridge, ipcRenderer } = require('electron')
 const { marked } = require('marked')
+const hljs = require('highlight.js')
 
-marked.setOptions({
+marked.use({
   gfm: true,
   breaks: false,
   headerIds: true,
-  mangle: false
+  mangle: false,
+  renderer: {
+    code(code, language) {
+      const lang = language && hljs.getLanguage(language) ? language : null
+      try {
+        const value = lang
+          ? hljs.highlight(code, { language: lang }).value
+          : hljs.highlightAuto(code).value
+        return `<pre><code class="hljs${lang ? ` language-${lang}` : ''}">${value}</code></pre>\n`
+      } catch {
+        return false
+      }
+    }
+  }
 })
 
 contextBridge.exposeInMainWorld('api', {

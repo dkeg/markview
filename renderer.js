@@ -39,6 +39,8 @@ const panelsResizeHandle   = $('panels-resize-handle')
 const tocResizeHandle      = $('toc-resize-handle')
 const tocPanel             = $('toc-panel')
 const tocList              = $('toc-list')
+const splitArea            = $('split-area')
+const panelsHResizeHandle  = $('panels-h-resize-handle')
 
 // ─── Init ───────────────────────────────────────────────────────────────────
 async function init() {
@@ -110,6 +112,7 @@ function initEditor() {
   })
 
   editor.on('scroll', () => {
+    if (viewMode === 'editor' && tocVisible) updateActiveTocFromEditor()
     if (!syncScrollActive || isSyncScrolling) return
     isSyncScrolling = true
     const info = editor.getScrollInfo()
@@ -333,7 +336,7 @@ function buildHeadingTree(headings) {
 
 function updateToc() {
   const tab = activeTab()
-  if (!tab || tab.type === 'json' || viewMode === 'editor') {
+  if (!tab || tab.type === 'json') {
     tocList.innerHTML = '<div class="toc-empty">No headings</div>'
     activeTocId = null
     return
@@ -407,6 +410,13 @@ function getHeadingScrollTop(heading) {
 }
 
 function navigateToHeading(heading) {
+  if (viewMode === 'editor') {
+    scrollEditorToHeading(heading)
+    activeTocId = heading.id
+    highlightActiveTocItem(heading.id)
+    return
+  }
+
   const el = previewContent.querySelector(`#${CSS.escape(heading.id)}`)
   if (!el) return
 
@@ -439,7 +449,8 @@ function scrollEditorToHeading(heading) {
 }
 
 function updateActiveTocFromScroll() {
-  if (!tocVisible || viewMode === 'editor') return
+  if (!tocVisible) return
+  if (viewMode === 'editor') { updateActiveTocFromEditor(); return }
 
   const tab = activeTab()
   if (!tab || tab.type === 'json') return
@@ -460,6 +471,30 @@ function updateActiveTocFromScroll() {
   }
 }
 
+function updateActiveTocFromEditor() {
+  if (!editor) return
+  const tab = activeTab()
+  if (!tab || tab.type === 'json') return
+
+  const info = editor.getScrollInfo()
+  const visibleLine = editor.lineAtHeight(info.top, 'local')
+  const lines = editor.getValue().split('\n')
+
+  let lastHeading = null
+  for (let i = 0; i <= Math.min(visibleLine + 2, lines.length - 1); i++) {
+    const match = lines[i].match(/^(#{1,6})\s+(.+)$/)
+    if (match) lastHeading = match[2].replace(/\s*#+\s*$/, '').trim()
+  }
+  if (!lastHeading) return
+
+  const headingEls = Array.from(previewContent.querySelectorAll('h1,h2,h3,h4,h5,h6'))
+  const found = headingEls.find(el => el.textContent.trim() === lastHeading)
+  if (found?.id && found.id !== activeTocId) {
+    activeTocId = found.id
+    highlightActiveTocItem(found.id)
+  }
+}
+
 function highlightActiveTocItem(id) {
   tocList.querySelectorAll('.toc-row').forEach(row => {
     row.classList.toggle('active', row.parentElement?.dataset.id === id)
@@ -467,7 +502,7 @@ function highlightActiveTocItem(id) {
 }
 
 function applyTocVisibility() {
-  const show = tocVisible && viewMode !== 'editor'
+  const show = tocVisible
   tocPanel.classList.toggle('hidden', !show)
   tocResizeHandle.classList.toggle('hidden', !show)
   $('btn-toc').classList.toggle('active', tocVisible)
@@ -635,6 +670,11 @@ function setViewMode(mode) {
   document.querySelectorAll('.view-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.mode === mode)
   })
+  editorPanel.style.flex = ''
+  editorPanel.style.width = ''
+  editorPanel.style.height = ''
+  previewPanel.style.flex = ''
+  previewPanel.style.height = ''
   applyTocVisibility()
   updateToc()
   editor && editor.refresh()
@@ -689,7 +729,7 @@ function bindMenuEvents() {
   api.on('menu-close-tab', () => { const tab = activeTab(); if (tab) closeTab(tab.id) })
   api.on('menu-view-mode', (mode) => setViewMode(mode))
   api.on('menu-cycle-view', () => {
-    const modes = ['editor', 'split', 'preview']
+    const modes = ['editor', 'split', 'hsplit', 'preview']
     const idx = modes.indexOf(viewMode)
     setViewMode(modes[(idx + 1) % modes.length])
   })
@@ -813,7 +853,7 @@ function initResizeHandles() {
   })
 
   makeResizable(panelsResizeHandle, (delta) => {
-    const totalWidth = panels.offsetWidth - (tocVisible && viewMode !== 'editor' ? tocPanel.offsetWidth + tocResizeHandle.offsetWidth : 0)
+    const totalWidth = splitArea.offsetWidth
     const editorWidth = editorPanel.offsetWidth
     const newEditorWidth = Math.max(200, Math.min(totalWidth - 200, editorWidth + delta))
     const pct = (newEditorWidth / totalWidth * 100).toFixed(2)
@@ -823,29 +863,42 @@ function initResizeHandles() {
     editor && editor.refresh()
   })
 
+  makeResizable(panelsHResizeHandle, (delta) => {
+    const totalHeight = splitArea.offsetHeight
+    const editorHeight = editorPanel.offsetHeight
+    const newEditorHeight = Math.max(80, Math.min(totalHeight - 80, editorHeight + delta))
+    const pct = (newEditorHeight / totalHeight * 100).toFixed(2)
+    editorPanel.style.flex = 'none'
+    editorPanel.style.height = pct + '%'
+    previewPanel.style.flex = '1'
+    editor && editor.refresh()
+  }, 'y')
+
   makeResizable(tocResizeHandle, (delta) => {
     const newWidth = Math.max(140, Math.min(320, tocPanel.offsetWidth - delta))
     tocPanel.style.width = newWidth + 'px'
   })
 }
 
-function makeResizable(handle, onDelta) {
-  let startX = 0
+function makeResizable(handle, onDelta, axis = 'x') {
+  let startPos = 0
   let dragging = false
+  const cursor = axis === 'y' ? 'row-resize' : 'col-resize'
 
   handle.addEventListener('mousedown', (e) => {
     e.preventDefault()
     dragging = true
-    startX = e.clientX
+    startPos = axis === 'y' ? e.clientY : e.clientX
     handle.classList.add('dragging')
-    document.body.style.cursor = 'col-resize'
+    document.body.style.cursor = cursor
     document.body.style.userSelect = 'none'
   })
 
   document.addEventListener('mousemove', (e) => {
     if (!dragging) return
-    const delta = e.clientX - startX
-    startX = e.clientX
+    const pos = axis === 'y' ? e.clientY : e.clientX
+    const delta = pos - startPos
+    startPos = pos
     onDelta(delta)
   })
 

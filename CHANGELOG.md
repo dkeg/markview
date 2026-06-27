@@ -4,6 +4,19 @@ All notable changes to MarkView will be documented here.
 
 ---
 
+## [1.2.0] — 2026-06-27
+
+### New Features
+
+- **Syntax-highlighted code blocks** — fenced code blocks in the markdown preview now render with full syntax coloring via highlight.js; language is auto-detected when not specified; token colors use the app's existing theme palette
+- **Table of contents works in editor-only mode** — clicking a heading in the TOC panel now scrolls the editor to that heading even when the preview is hidden; scroll spy tracks the active heading as you type and scroll
+
+### Build
+
+- Added `highlight.js` as a dependency; bundled in production build
+
+---
+
 ## [1.1.0] — 2026-06-19
 
 ### Added

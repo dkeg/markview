@@ -6,6 +6,7 @@ A native macOS markdown viewer and editor built with Electron. Designed to feel 
 
 - **Native macOS look and feel** — hidden titlebar with traffic lights, vibrancy sidebar, system font defaults
 - **Syntax-highlighted editor** — CodeMirror-powered with markdown color-coding (headers, bold, italic, links, code blocks, lists)
+- **Syntax-highlighted code blocks** — fenced code blocks in the preview render with full language-aware coloring via highlight.js
 - **Live preview** — rendered markdown preview with full GFM support (tables, task lists, fenced code)
 - **Split view** — editor and preview side by side, or toggle between edit-only and preview-only modes
 - **Synchronized scrolling** — optional linked scrolling between editor and preview in split view

@@ -405,6 +405,19 @@ select { cursor: pointer; }
 .resize-handle.vertical:hover,
 .resize-handle.vertical.dragging { background: var(--resize-handle-hover); }
 
+.resize-handle.horizontal {
+  height: 5px;
+  cursor: row-resize;
+  background: var(--resize-handle);
+  flex-shrink: 0;
+  transition: background 0.15s;
+  position: relative;
+  z-index: 10;
+  display: none;
+}
+.resize-handle.horizontal:hover,
+.resize-handle.horizontal.dragging { background: var(--resize-handle-hover); }
+
 /* ─── Main Content ───────────────────────────────────────────────────── */
 #main-content {
   flex: 1;
@@ -518,11 +531,21 @@ select { cursor: pointer; }
   min-height: 0;
 }
 
+#split-area {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+}
+
 #editor-panel,
 #preview-panel {
   flex: 1;
   overflow: hidden;
   min-width: 0;
+  min-height: 0;
 }
 
 /* ─── CodeMirror Editor ──────────────────────────────────────────────── */
@@ -715,6 +738,52 @@ select { cursor: pointer; }
   border-radius: 6px;
 }
 
+/* ─── Preview code block syntax highlighting (highlight.js tokens) ──── */
+#preview-content pre code.hljs { background: none; padding: 0; color: var(--preview-text); }
+
+#preview-content .hljs-keyword,
+#preview-content .hljs-operator,
+#preview-content .hljs-selector-tag,
+#preview-content .hljs-tag { color: var(--md-keyword); }
+
+#preview-content .hljs-built_in,
+#preview-content .hljs-name { color: var(--md-keyword); opacity: 0.85; }
+
+#preview-content .hljs-string,
+#preview-content .hljs-template-string,
+#preview-content .hljs-template-variable,
+#preview-content .hljs-regexp,
+#preview-content .hljs-symbol { color: var(--md-code); }
+
+#preview-content .hljs-number,
+#preview-content .hljs-literal { color: var(--json-number); }
+
+#preview-content .hljs-comment,
+#preview-content .hljs-quote { color: var(--md-quote); font-style: italic; }
+
+#preview-content .hljs-title,
+#preview-content .hljs-title.class_,
+#preview-content .hljs-section,
+#preview-content .hljs-type { color: var(--md-heading); }
+
+#preview-content .hljs-attr,
+#preview-content .hljs-attribute,
+#preview-content .hljs-property { color: var(--json-key); }
+
+#preview-content .hljs-variable,
+#preview-content .hljs-variable.language_ { color: var(--md-link); }
+
+#preview-content .hljs-meta { color: var(--md-quote); }
+#preview-content .hljs-selector-class,
+#preview-content .hljs-selector-id { color: var(--md-keyword); }
+#preview-content .hljs-deletion { color: #cf222e; }
+#preview-content .hljs-addition { color: #116329; }
+[data-theme="dark"] #preview-content .hljs-deletion { color: #ff7b72; }
+[data-theme="dark"] #preview-content .hljs-addition { color: #3fb950; }
+#preview-content .hljs-emphasis { font-style: italic; }
+#preview-content .hljs-strong { font-weight: bold; }
+#preview-content .hljs-punctuation { opacity: 0.6; }
+
 /* JSON preview */
 #preview-content.json-preview {
   font-family: 'SF Mono', Menlo, monospace;
@@ -725,14 +794,23 @@ select { cursor: pointer; }
 }
 
 /* ─── View Modes ─────────────────────────────────────────────────────── */
-#panels[data-mode="editor"] #preview-panel,
-#panels[data-mode="editor"] #panels-resize-handle,
-#panels[data-mode="editor"] #toc-panel,
-#panels[data-mode="editor"] #toc-resize-handle { display: none; }
 
+/* editor mode: hide preview and its resize handle; show TOC */
+#panels[data-mode="editor"] #preview-panel,
+#panels[data-mode="editor"] #panels-resize-handle { display: none; }
+
+/* preview mode: hide editor and its vertical resize handle */
 #panels[data-mode="preview"] #editor-panel,
 #panels[data-mode="preview"] #panels-resize-handle { display: none; }
 
+/* hsplit mode: stack editor on top, preview on bottom */
+#panels[data-mode="hsplit"] #split-area { flex-direction: column; }
+#panels[data-mode="hsplit"] #panels-resize-handle { display: none; }
+#panels[data-mode="hsplit"] #panels-h-resize-handle { display: block; }
+#panels[data-mode="hsplit"] #editor-panel,
+#panels[data-mode="hsplit"] #preview-panel { min-width: 0; }
+
+/* TOC visibility override */
 #toc-panel.hidden,
 #toc-resize-handle.hidden { display: none; }
 

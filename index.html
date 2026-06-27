@@ -73,6 +73,12 @@
               <path d="M1 2.5A1.5 1.5 0 012.5 1h11A1.5 1.5 0 0115 2.5v11a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 13.5v-11zm1.5-.5a.5.5 0 00-.5.5v11a.5.5 0 00.5.5h5v-12H2.5zm5.5 12h5.5a.5.5 0 00.5-.5v-11a.5.5 0 00-.5-.5H8v12z"/>
             </svg>
           </button>
+          <button class="view-btn" id="btn-view-hsplit" data-mode="hsplit" title="Horizontal Split">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+              <rect x="1.5" y="1.5" width="13" height="5.25" rx="1"/>
+              <rect x="1.5" y="9.25" width="13" height="5.25" rx="1"/>
+            </svg>
+          </button>
           <button class="view-btn active" id="btn-view-preview" data-mode="preview" title="Preview Only (⌘3)">
             <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
               <path d="M8 2C4.13 2 1 5.13 1 8s3.13 6 7 6 7-3.13 7-6-3.13-6-7-6zm0 10.5c-2.485 0-4.5-2.015-4.5-4.5S5.515 3.5 8 3.5 12.5 5.515 12.5 8 10.485 12.5 8 12.5z"/>
@@ -100,12 +106,15 @@
 
       <!-- Panels -->
       <div id="panels" data-mode="preview">
-        <div id="editor-panel">
-          <textarea id="editor-textarea"></textarea>
-        </div>
-        <div class="resize-handle vertical" id="panels-resize-handle"></div>
-        <div id="preview-panel">
-          <div id="preview-content"></div>
+        <div id="split-area">
+          <div id="editor-panel">
+            <textarea id="editor-textarea"></textarea>
+          </div>
+          <div class="resize-handle horizontal" id="panels-h-resize-handle"></div>
+          <div class="resize-handle vertical" id="panels-resize-handle"></div>
+          <div id="preview-panel">
+            <div id="preview-content"></div>
+          </div>
         </div>
         <div class="resize-handle vertical" id="toc-resize-handle"></div>
         <aside id="toc-panel">
@@ -227,9 +236,22 @@
   </div>
 
   <script src="node_modules/codemirror/lib/codemirror.js"></script>
+  <script src="node_modules/codemirror/mode/meta.js"></script>
   <script src="node_modules/codemirror/mode/markdown/markdown.js"></script>
   <script src="node_modules/codemirror/mode/javascript/javascript.js"></script>
   <script src="node_modules/codemirror/mode/xml/xml.js"></script>
+  <script src="node_modules/codemirror/mode/css/css.js"></script>
+  <script src="node_modules/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+  <script src="node_modules/codemirror/mode/python/python.js"></script>
+  <script src="node_modules/codemirror/mode/shell/shell.js"></script>
+  <script src="node_modules/codemirror/mode/yaml/yaml.js"></script>
+  <script src="node_modules/codemirror/mode/go/go.js"></script>
+  <script src="node_modules/codemirror/mode/rust/rust.js"></script>
+  <script src="node_modules/codemirror/mode/clike/clike.js"></script>
+  <script src="node_modules/codemirror/mode/sql/sql.js"></script>
+  <script src="node_modules/codemirror/mode/swift/swift.js"></script>
+  <script src="node_modules/codemirror/mode/dockerfile/dockerfile.js"></script>
+  <script src="node_modules/codemirror/mode/toml/toml.js"></script>
   <script src="node_modules/codemirror/addon/edit/closebrackets.js"></script>
   <script src="node_modules/codemirror/addon/edit/matchbrackets.js"></script>
   <script src="renderer.js"></script>

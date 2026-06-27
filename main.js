@@ -157,6 +157,10 @@ function buildMenu() {
           click: () => mainWindow && mainWindow.webContents.send('menu-view-mode', 'split')
         },
         {
+          label: 'Horizontal Split',
+          click: () => mainWindow && mainWindow.webContents.send('menu-view-mode', 'hsplit')
+        },
+        {
           label: 'Preview Only',
           accelerator: 'Cmd+3',
           click: () => mainWindow && mainWindow.webContents.send('menu-view-mode', 'preview')
