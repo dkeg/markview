@@ -56,6 +56,8 @@ async function init() {
   bindWelcomeButtons()
   bindSettingsModal()
   bindMenuEvents()
+  bindFileDrop()
+  bindPreviewLinks()
   setViewMode(viewMode)
   applyTocVisibility()
 
@@ -295,7 +297,7 @@ function updatePreview() {
     updateToc()
   } else {
     previewContent.className = ''
-    previewContent.innerHTML = api.renderMarkdown(tab.content)
+    previewContent.innerHTML = api.renderMarkdown(tab.content, tab.filePath)
     // Make task list checkboxes non-interactive
     previewContent.querySelectorAll('input[type="checkbox"]').forEach(cb => {
       cb.disabled = true
@@ -545,6 +547,34 @@ async function openFolder(folderPath) {
   await renderFileTree(folderPath, fileTree, 0)
 }
 
+// Drag files and folders from Finder onto the window. Folders open in the
+// sidebar (the last one dropped wins); files open as tabs.
+// External links in the preview open in the default browser instead of
+// navigating the app window away.
+function bindPreviewLinks() {
+  previewContent.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href]')
+    if (!a) return
+    const href = a.getAttribute('href')
+    if (/^(https?:|mailto:)/i.test(href)) {
+      e.preventDefault()
+      api.openExternal(href)
+    }
+  })
+}
+
+function bindFileDrop() {
+  api.onDrop(async (entries) => {
+    const folders = entries.filter(e => e.isDirectory)
+    const files = entries.filter(e => !e.isDirectory)
+    if (folders.length) {
+      if (!sidebarVisible) toggleSidebar()
+      await openFolder(folders[folders.length - 1].path)
+    }
+    for (const f of files) await openFile(f.path)
+  })
+}
+
 async function renderFileTree(dirPath, container, depth) {
   container.innerHTML = ''
   const entries = await api.readDir(dirPath)
@@ -683,6 +713,7 @@ function setViewMode(mode) {
 function toggleSidebar() {
   sidebarVisible = !sidebarVisible
   sidebar.classList.toggle('hidden', !sidebarVisible)
+  document.body.classList.toggle('sidebar-hidden', !sidebarVisible)
   sidebarResizeHandle.style.display = sidebarVisible ? '' : 'none'
   editor && editor.refresh()
 }

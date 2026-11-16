@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:;">
   <title>MarkView</title>
-  <link rel="stylesheet" href="node_modules/codemirror/lib/codemirror.css">
+  <link rel="stylesheet" href="vendor/codemirror/lib/codemirror.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -235,25 +235,29 @@
     </div>
   </div>
 
-  <script src="node_modules/codemirror/lib/codemirror.js"></script>
-  <script src="node_modules/codemirror/mode/meta.js"></script>
-  <script src="node_modules/codemirror/mode/markdown/markdown.js"></script>
-  <script src="node_modules/codemirror/mode/javascript/javascript.js"></script>
-  <script src="node_modules/codemirror/mode/xml/xml.js"></script>
-  <script src="node_modules/codemirror/mode/css/css.js"></script>
-  <script src="node_modules/codemirror/mode/htmlmixed/htmlmixed.js"></script>
-  <script src="node_modules/codemirror/mode/python/python.js"></script>
-  <script src="node_modules/codemirror/mode/shell/shell.js"></script>
-  <script src="node_modules/codemirror/mode/yaml/yaml.js"></script>
-  <script src="node_modules/codemirror/mode/go/go.js"></script>
-  <script src="node_modules/codemirror/mode/rust/rust.js"></script>
-  <script src="node_modules/codemirror/mode/clike/clike.js"></script>
-  <script src="node_modules/codemirror/mode/sql/sql.js"></script>
-  <script src="node_modules/codemirror/mode/swift/swift.js"></script>
-  <script src="node_modules/codemirror/mode/dockerfile/dockerfile.js"></script>
-  <script src="node_modules/codemirror/mode/toml/toml.js"></script>
-  <script src="node_modules/codemirror/addon/edit/closebrackets.js"></script>
-  <script src="node_modules/codemirror/addon/edit/matchbrackets.js"></script>
+  <script src="vendor/codemirror/lib/codemirror.js"></script>
+  <script src="vendor/codemirror/addon/mode/simple.js"></script>
+  <script src="vendor/codemirror/mode/meta.js"></script>
+  <script src="vendor/codemirror/mode/markdown/markdown.js"></script>
+  <script src="vendor/codemirror/mode/javascript/javascript.js"></script>
+  <script src="vendor/codemirror/mode/xml/xml.js"></script>
+  <script src="vendor/codemirror/mode/css/css.js"></script>
+  <script src="vendor/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+  <script src="vendor/codemirror/mode/python/python.js"></script>
+  <script src="vendor/codemirror/mode/shell/shell.js"></script>
+  <script src="vendor/codemirror/mode/yaml/yaml.js"></script>
+  <script src="vendor/codemirror/mode/go/go.js"></script>
+  <script src="vendor/codemirror/mode/rust/rust.js"></script>
+  <script src="vendor/codemirror/mode/clike/clike.js"></script>
+  <script src="vendor/codemirror/mode/sql/sql.js"></script>
+  <script src="vendor/codemirror/mode/swift/swift.js"></script>
+  <script src="vendor/codemirror/mode/dockerfile/dockerfile.js"></script>
+  <script src="vendor/codemirror/mode/toml/toml.js"></script>
+  <script src="vendor/codemirror/addon/edit/closebrackets.js"></script>
+  <script src="vendor/codemirror/addon/edit/matchbrackets.js"></script>
+  <script src="vendor/marked.min.js"></script>
+  <script src="vendor/highlight.min.js"></script>
+  <script src="bridge.js"></script>
   <script src="renderer.js"></script>
 </body>
 </html>

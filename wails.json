@@ -1,0 +1,41 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "MarkView",
+  "outputfilename": "MarkView",
+  "frontend:dir": "frontend",
+  "frontend:install": "",
+  "frontend:build": "",
+  "author": {
+    "name": "dkeg"
+  },
+  "info": {
+    "companyName": "dkeg",
+    "productName": "MarkView",
+    "productVersion": "2.0.0",
+    "fileAssociations": [
+      {
+        "ext": "md",
+        "name": "Markdown File",
+        "description": "Markdown document",
+        "iconName": "fileicon",
+        "role": "Editor"
+      },
+      {
+        "ext": "markdown",
+        "name": "Markdown File",
+        "description": "Markdown document",
+        "iconName": "fileicon",
+        "role": "Editor"
+      },
+      {
+        "ext": "json",
+        "name": "JSON File",
+        "description": "JSON document",
+        "iconName": "fileicon",
+        "role": "Editor"
+      }
+    ],
+    "copyright": "Copyright © 2026 dkeg",
+    "comments": "Markdown viewer and editor"
+  }
+}

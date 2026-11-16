@@ -441,6 +441,7 @@ select { cursor: pointer; }
   gap: 8px;
   padding-top: env(titlebar-area-height, 0);
   -webkit-app-region: drag;
+  --wails-draggable: drag;
 }
 
 #toolbar button,
@@ -448,10 +449,14 @@ select { cursor: pointer; }
 #toolbar select,
 #toolbar textarea {
   -webkit-app-region: no-drag;
+  --wails-draggable: no-drag;
 }
 
 /* Account for traffic lights on the content side */
 #main-content:not(:first-child) #toolbar { padding-top: 0; }
+
+/* With the sidebar collapsed the toolbar sits under the traffic lights */
+body.sidebar-hidden #toolbar { padding-left: 84px; transition: padding-left 0.15s ease; }
 
 #view-mode-buttons {
   display: flex;
