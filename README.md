@@ -2,6 +2,8 @@
 
 A native macOS markdown viewer and editor built with Go and Wails. Designed to feel at home on macOS with system theme support, a clean sidebar with vertical tabs, and a syntax-highlighted editor with live preview.
 
+![MarkView preview mode with table of contents](docs/media/preview.png)
+
 ## Features
 
 - **Native macOS look and feel** — hidden titlebar with traffic lights, vibrancy sidebar, system font defaults
@@ -19,6 +21,14 @@ A native macOS markdown viewer and editor built with Go and Wails. Designed to f
 - **System theme** — follows macOS dark/light mode automatically, or set manually
 - **Customizable fonts** — choose font family and size in settings with live preview
 - **File open from Finder** — double-click any associated `.md` or `.json` file to open directly in MarkView
+
+## View modes
+
+Switch with the toolbar or <kbd>⌘1</kbd>–<kbd>⌘3</kbd>.
+
+| Editor | Split | Horizontal split |
+| :---: | :---: | :---: |
+| ![Editor only](docs/media/editor.png) | ![Split view](docs/media/split.png) | ![Horizontal split](docs/media/hsplit.png) |
 
 ## Install
 
