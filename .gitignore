@@ -11,5 +11,7 @@ dist/
 # IDE / editor
 .claude/
 
-# Electron builder cache
-.cache/
+
+# Wails build output
+build/bin/
+frontend/wailsjs/

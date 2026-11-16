@@ -4,6 +4,34 @@ All notable changes to MarkView will be documented here.
 
 ---
 
+## [2.0.0] — 2026-11-15
+
+### Changed
+
+- **Rebuilt on Go + Wails instead of Electron.** The UI is unchanged, but it now runs in the system WebKit view with a Go backend, so the app is smaller and uses less memory. Existing settings and sessions carry over automatically.
+- Building now uses `make build` / `make dmg` (Go + Wails CLI) instead of npm and electron-builder. Frontend libraries are vendored, so no `npm install` is needed.
+- Closing the window now quits the app.
+- Requires macOS 13 Ventura or later.
+- External links in the preview open in your default browser instead of inside the app window.
+
+### New Features
+
+- **Homebrew** — install with `brew install --cask dkeg/tap/markview`. Releases are now signed with a Developer ID and notarized by Apple.
+- **Drag and drop** — drop folders onto the window to open them in the sidebar, or drop files to open them as tabs.
+- **Local images in the preview** — relative and absolute image paths in markdown now resolve against the document's folder. Remote (`https:`) images are now allowed too.
+- `.markdown` files are associated with MarkView alongside `.md` and `.json`.
+
+### Fixed
+
+- With the sidebar collapsed, the traffic-light buttons no longer cover the view-mode buttons.
+- Rust and Dockerfile syntax modes in the editor failed to load (missing CodeMirror simple-mode addon).
+
+### Removed
+
+- "Services", "Hide Others", "Show All" and "Toggle Developer Tools" menu items (devtools are available in `make dev`).
+
+---
+
 ## [1.2.0] — 2026-06-27
 
 ### New Features
